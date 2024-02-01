@@ -4,7 +4,7 @@ provider "aws" {
 
 # Create an S3 bucket
 resource "aws_s3_bucket" "report_bucket" {
-  bucket = "kmssm" # Replace with your desired bucket name
+  bucket = "kmssm" 
   acl    = "private"
 
   versioning {
@@ -76,7 +76,7 @@ resource "aws_lambda_function" "kms_report_lambda" {
     }
   }
 
-  # Filename argument to specify the Lambda function code
+  # Filename  to specify the Lambda function code
   filename = "C:/Users/chauhanarjit/Desktop/tks/lambda_function_kms.zip"
 }
 
@@ -94,6 +94,6 @@ resource "aws_lambda_function" "secrets_manager_report_lambda" {
     }
   }
 
-  # Filename argument to specify the Lambda function code
+  # Filename  to specify the Lambda function code
   filename = "C:/Users/chauhanarjit/Desktop/tks/lambda_function_secrets_manager.zip"
 }
