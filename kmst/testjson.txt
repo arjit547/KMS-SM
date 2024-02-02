@@ -1,0 +1,11 @@
+{
+  "S3_BUCKET": "kmssm",
+  "S3_FOLDER": "secrets_manager_reports"
+}
+
+
+
+{
+  "S3_BUCKET": "kmssm",
+  "S3_FOLDER": "kms_reports"
+}
