@@ -1,0 +1,99 @@
+provider "aws" {
+  region = "us-east-1" 
+}
+
+# Create an S3 bucket
+resource "aws_s3_bucket" "report_bucket" {
+  bucket = "kmssm" 
+  acl    = "private"
+
+  versioning {
+    enabled = true
+  }
+}
+
+# Create IAM role for Lambda execution
+resource "aws_iam_role" "lambda_execution_role" {
+  name = "lambda_execution_role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      }
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_execution_policy_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/AWSLambda_FullAccess"
+  role       = aws_iam_role.lambda_execution_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "s3_policy_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+  role       = aws_iam_role.lambda_execution_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_policy_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
+  role       = aws_iam_role.lambda_execution_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "cloudtrail_policy_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/AWSCloudTrail_FullAccess"
+  role       = aws_iam_role.lambda_execution_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "kms_power_user_policy_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser"
+  role       = aws_iam_role.lambda_execution_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "secrets_manager_policy_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+  role       = aws_iam_role.lambda_execution_role.name
+}
+
+# Lambda function for KMS report
+resource "aws_lambda_function" "kms_report_lambda" {
+  function_name = "kms_report_lambda"
+  handler       = "lambda_function_kms.lambda_handler"
+  runtime       = "python3.8"
+  role          = aws_iam_role.lambda_execution_role.arn
+
+  environment {
+    variables = {
+      S3_BUCKET = aws_s3_bucket.report_bucket.bucket
+      S3_FOLDER = "kms_reports"
+    }
+  }
+
+  # Filename  to specify the Lambda function code
+  filename = "C:/Users/chauhanarjit/Desktop/tks/lambda_function_kms.zip"
+}
+
+# Lambda function for Secrets Manager report
+resource "aws_lambda_function" "secrets_manager_report_lambda" {
+  function_name = "secrets_manager_report_lambda"
+  handler       = "lambda_function_secrets_manager.lambda_handler"
+  runtime       = "python3.8"
+  role          = aws_iam_role.lambda_execution_role.arn
+
+  environment {
+    variables = {
+      S3_BUCKET = aws_s3_bucket.report_bucket.bucket
+      S3_FOLDER = "secrets_manager_reports"
+    }
+  }
+
+  # Filename  to specify the Lambda function code
+  filename = "C:/Users/chauhanarjit/Desktop/tks/lambda_function_secrets_manager.zip"
+}
