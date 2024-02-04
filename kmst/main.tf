@@ -27,7 +27,7 @@ resource "aws_lambda_function" "kms_report_lambda" {
     }
   }
 
-  # Filename argument to specify the Lambda function code
+  # Filename  to specify the Lambda function code
   filename = "${var.lambda_zip_path_kms}lambda_function_kms.zip"
 }
 
@@ -45,6 +45,6 @@ resource "aws_lambda_function" "secrets_manager_report_lambda" {
     }
   }
 
-  # Filename argument to specify the Lambda function code
+  # Filename  to specify the Lambda function code
   filename = "${var.lambda_zip_path_secrets_manager}lambda_function_secrets_manager.zip"
 }
